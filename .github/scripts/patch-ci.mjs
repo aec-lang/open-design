@@ -3,8 +3,9 @@ import fs from "node:fs";
 
 const file = "tools/pack/src/linux.ts";
 const src = fs.readFileSync(file, "utf8");
-const needle = '"${PRODUCTION_INSTALL_PNPM_BIN_ENV}=${CONTAINER_PNPM_PATH}",\n  ];';
-const inject = '"${PRODUCTION_INSTALL_PNPM_BIN_ENV}=${CONTAINER_PNPM_PATH}",\n    "-e",\n    "CI=true",\n  ];';
+const bt = String.fromCharCode(96);
+const needle = bt + "${PRODUCTION_INSTALL_PNPM_BIN_ENV}=${CONTAINER_PNPM_PATH}" + bt + ",\n  ];";
+const inject = bt + "${PRODUCTION_INSTALL_PNPM_BIN_ENV}=${CONTAINER_PNPM_PATH}" + bt + ",\n    \"-e\",\n    \"CI=true\",\n  ];";
 if (!src.includes(needle)) {
   console.error("anchor not found in tools/pack/src/linux.ts");
   process.exit(1);

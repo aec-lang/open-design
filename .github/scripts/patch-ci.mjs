@@ -24,16 +24,20 @@ const repl2 = '    private: true,\n    main: "main.cjs",\n    dependencies,\n   
 if (!src.includes(anchor2)) { console.error("anchor2 not found"); process.exit(1); }
 src = src.replace(anchor2, repl2);
 
-// Patch 3: expose the pnpm binary on PATH under its real name so
-// electron-builder (which shells out to pnpm) can find it.
-const anchor3 = bt + "chmod +x ${CONTAINER_PNPM_PATH}" + bt + " && ";
-const repl3 = anchor3 + bt + "mkdir -p ${CONTAINER_PNPM_HOME}/bin && ln -sf ${CONTAINER_PNPM_PATH} ${CONTAINER_PNPM_HOME}/bin/pnpm && " + bt + " && ";
+// Patch 3: expose pnpm binary as "pnpm" in PNPM_HOME/bin.
+const anchor3 = bt + "chmod +x ${CONTAINER_PNPM_PATH} && " + bt;
+const repl3 = bt + "chmod +x ${CONTAINER_PNPM_PATH} && mkdir -p ${CONTAINER_PNPM_HOME}/bin && ln -sf ${CONTAINER_PNPM_PATH} ${CONTAINER_PNPM_HOME}/bin/pnpm && " + bt;
 if (!src.includes(anchor3)) { console.error("anchor3 not found"); process.exit(1); }
 src = src.replace(anchor3, repl3);
 
 // Patch 4: put ${CONTAINER_PNPM_HOME}/bin at the front of PATH (both lines).
-const anchor4a = bt + "PNPM_HOME=${CONTAINER_PNPM_HOME} PATH=${CONTAINER_PNPM_HOME}:$PATH ${CONTAINER_PNPM_PATH} env use --global ${CONTAINER_NODE_VERSION} && " + bt + " + " + bt + "export PNPM_HOME=${CONTAINER_PNPM_HOME} PATH=${CONTAINER_PNPM_HOME}:$PATH && " + bt;
-const repl4a = bt + "PNPM_HOME=${CONTAINER_PNPM_HOME} PATH=${CONTAINER_PNPM_HOME}/bin:${CONTAINER_PNPM_HOME}:$PATH ${CONTAINER_PNPM_PATH} env use --global ${CONTAINER_NODE_VERSION} && " + bt + " + " + bt + "export PNPM_HOME=${CONTAINER_PNPM_HOME} PATH=${CONTAINER_PNPM_HOME}/bin:${CONTAINER_PNPM_HOME}:$PATH && " + bt;
+const gap = " +\n    ";
+const a4_1 = bt + "PNPM_HOME=${CONTAINER_PNPM_HOME} PATH=${CONTAINER_PNPM_HOME}:$PATH ${CONTAINER_PNPM_PATH} env use --global ${CONTAINER_NODE_VERSION} && " + bt;
+const a4_2 = bt + "export PNPM_HOME=${CONTAINER_PNPM_HOME} PATH=${CONTAINER_PNPM_HOME}:$PATH && " + bt;
+const anchor4a = a4_1 + gap + a4_2;
+const r4_1 = bt + "PNPM_HOME=${CONTAINER_PNPM_HOME} PATH=${CONTAINER_PNPM_HOME}/bin:${CONTAINER_PNPM_HOME}:$PATH ${CONTAINER_PNPM_PATH} env use --global ${CONTAINER_NODE_VERSION} && " + bt;
+const r4_2 = bt + "export PNPM_HOME=${CONTAINER_PNPM_HOME} PATH=${CONTAINER_PNPM_HOME}/bin:${CONTAINER_PNPM_HOME}:$PATH && " + bt;
+const repl4a = r4_1 + gap + r4_2;
 if (!src.includes(anchor4a)) { console.error("anchor4a not found"); process.exit(1); }
 src = src.replace(anchor4a, repl4a);
 

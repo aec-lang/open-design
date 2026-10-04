@@ -31,11 +31,11 @@ const repl3 = anchor3 + bt + "mkdir -p ${CONTAINER_PNPM_HOME}/bin && ln -sf ${CO
 if (!src.includes(anchor3)) { console.error("anchor3 not found"); process.exit(1); }
 src = src.replace(anchor3, repl3);
 
-// Patch 4: put ${CONTAINER_PNPM_HOME}/bin at the front of PATH.
-const anchor4 = bt + "PNPM_HOME=${CONTAINER_PNPM_HOME} PATH=${CONTAINER_PNPM_HOME}:$PATH ${CONTAINER_PNPM_PATH} env use --global ${CONTAINER_NODE_VERSION} && " + bt + " + " + bt + "export PNPM_HOME=${CONTAINER_PNPM_HOME} PATH=${CONTAINER_PNPM_HOME}:$PATH && " + bt;
-const repl4 = bt + "PNPM_HOME=${CONTAINER_PNPM_HOME} PATH=${CONTAINER_PNPM_HOME}/bin:${CONTAINER_PNPM_HOME}:$PATH ${CONTAINER_PNPM_PATH} env use --global ${CONTAINER_NODE_VERSION} && " + bt + " + " + bt + "export PNPM_HOME=${CONTAINER_PNPM_HOME} PATH=${CONTAINER_PNPM_HOME}/bin:${CONTAINER_PNPM_HOME}:$PATH && " + bt;
-if (!src.includes(anchor4)) { console.error("anchor4 not found"); process.exit(1); }
-src = src.replace(anchor4, repl4);
+// Patch 4: put ${CONTAINER_PNPM_HOME}/bin at the front of PATH (both lines).
+const anchor4a = bt + "PNPM_HOME=${CONTAINER_PNPM_HOME} PATH=${CONTAINER_PNPM_HOME}:$PATH ${CONTAINER_PNPM_PATH} env use --global ${CONTAINER_NODE_VERSION} && " + bt + " + " + bt + "export PNPM_HOME=${CONTAINER_PNPM_HOME} PATH=${CONTAINER_PNPM_HOME}:$PATH && " + bt;
+const repl4a = bt + "PNPM_HOME=${CONTAINER_PNPM_HOME} PATH=${CONTAINER_PNPM_HOME}/bin:${CONTAINER_PNPM_HOME}:$PATH ${CONTAINER_PNPM_PATH} env use --global ${CONTAINER_NODE_VERSION} && " + bt + " + " + bt + "export PNPM_HOME=${CONTAINER_PNPM_HOME} PATH=${CONTAINER_PNPM_HOME}/bin:${CONTAINER_PNPM_HOME}:$PATH && " + bt;
+if (!src.includes(anchor4a)) { console.error("anchor4a not found"); process.exit(1); }
+src = src.replace(anchor4a, repl4a);
 
 fs.writeFileSync(file, src);
 console.log("patched tools/pack/src/linux.ts");

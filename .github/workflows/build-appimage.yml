@@ -40,6 +40,29 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Patch containerized build to forward CI=true
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require("node:fs");
+          const path = "tools/pack/src/linux.ts";
+          const src = fs.readFileSync(path, "utf8");
+          const needle = '"${PRODUCTION_INSTALL_PNPM_BIN_ENV}=${CONTAINER_PNPM_PATH}",
+  ];';
+          const inject = '"${PRODUCTION_INSTALL_PNPM_BIN_ENV}=${CONTAINER_PNPM_PATH}",
+    "-e",
+    "CI=true",
+  ];';
+          if (!src.includes(needle)) {
+            console.error("anchor not found in tools/pack/src/linux.ts");
+            process.exit(1);
+          }
+          fs.writeFileSync(path, src.replace(needle, inject));
+          NODE
+
+      - name: Rebuild tools-pack
+        run: pnpm --filter @open-design/tools-pack build
+
       - name: Build AppImage
         run: |
           set -euo pipefail
